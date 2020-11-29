@@ -1,40 +1,23 @@
-import {addTrackList} from './modules/track-list';
+import {addTrackList} from './track-list';
 
 (function () {
+  const TONARM_START_ANGLE = 26;
+  const TONARM_END_ANGLE = 43;
+  const INSIDE_VINYLIZER_DISTANCE = 85;
 
   const wrapper = document.querySelector('.page-wrapper');
   const vinylizer = wrapper.querySelector('.vinylizer');
   const vinylizerButton = vinylizer.querySelector('.vinylizer__button');
   const vinylizerRecord = vinylizer.querySelector('.vinylizer__record');
   const vinylizerTonarm = wrapper.querySelector('.vinylizer__tonarm');
-  const TONARM_START_ANGLE = 26;
-  const TONARM_END_ANGLE = 43;
   const trackCurrentTime = vinylizer.querySelector('.vinylizer__current-time span');
+  const vinylizerRecordSpin = vinylizer.querySelector('.vinylizer__spin');
+  const audio = wrapper.querySelector('audio');
 
-  window.vinylizerRecordSpin = vinylizer.querySelector('.vinylizer__spin');
-  window.audio = wrapper.querySelector('audio');
-
-  vinylizerButton.addEventListener('click', function () {
-    vinylizerRecordSpin.classList.toggle('playing');
-
-    if (vinylizerRecordSpin.classList.contains('playing')) {
-      vinylizerButton.style.transform = `rotate(180deg)`;
-      audio.play();
-    } else {
-      vinylizerButton.style.transform = `rotate(0deg)`;
-      audio.pause();
-    }
-  });
-
-  audio.addEventListener('play', function() {
-    vinylizerRecordSpin.classList.add('playing');
-  });
-
-  audio.addEventListener('ended', function () {
-    vinylizerRecordSpin.classList.toggle('playing');
-    vinylizerTonarm.style.transform = `rotate(0deg)`;
-    trackCurrentTime.textContent = `00:00:000`;
-  });
+  const centreVinylizerPoint = {
+    x: vinylizerRecord.offsetWidth / 2,
+    y: vinylizerRecord.offsetHeight / 2,
+  }
 
   /**
    * Меняет положение тонарма в зависимости от текущего времени трека
@@ -83,26 +66,41 @@ import {addTrackList} from './modules/track-list';
     return Math.floor(Math.hypot(x2 - x1, y2 - y1));
   }
 
-  vinylizerRecord.addEventListener('click', function (e) {
-    const currentPointX = e.offsetX;
-    const currentPointY = e.offsetY;
-    const insideDistance = 85;
-    const outsideDistance = e.currentTarget.offsetWidth / 2;
+  vinylizerButton.addEventListener('click', function () {
+    vinylizerRecordSpin.classList.toggle('playing');
 
-    let centrePoint = {
-      x: e.currentTarget.offsetWidth / 2,
-      y: e.currentTarget.offsetHeight / 2,
+    if (vinylizerRecordSpin.classList.contains('playing')) {
+      audio.play();
+    } else {
+      audio.pause();
     }
+  });
 
-    const allDistance = getDistance(centrePoint.x, centrePoint.y, currentPointX, currentPointY);
+  audio.addEventListener('play', function() {
+    vinylizerButton.classList.add('vinylizer__button--playing');
+    vinylizerRecordSpin.classList.add('playing');
+  });
 
-    if (allDistance > insideDistance && allDistance < outsideDistance) {
-      audio.currentTime = audio.duration * (1 - ((allDistance - insideDistance) / (outsideDistance - insideDistance)));
+  audio.addEventListener('pause', function() {
+    vinylizerButton.classList.remove('vinylizer__button--playing');
+  });
+
+  audio.addEventListener('ended', function () {
+    vinylizerRecordSpin.classList.toggle('playing');
+    vinylizerButton.classList.remove('vinylizer__button--playing');
+    vinylizerTonarm.style.transform = `rotate(0deg)`;
+    trackCurrentTime.textContent = `00:00:000`;
+  });
+
+  vinylizerRecord.addEventListener('click', function (e) {
+    const allDistance = getDistance(centreVinylizerPoint.x, centreVinylizerPoint.y, e.offsetX, e.offsetY);
+
+    if (allDistance > INSIDE_VINYLIZER_DISTANCE && allDistance < centreVinylizerPoint.x) {
+      audio.currentTime = audio.duration * (1 - ((allDistance - INSIDE_VINYLIZER_DISTANCE) / (centreVinylizerPoint.x - INSIDE_VINYLIZER_DISTANCE)));
       audio.play();
     }
   });
 
   addTrackList();
   changeAudioTime();
-
 })();

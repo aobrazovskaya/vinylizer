@@ -503,7 +503,7 @@ button,
 .main-page {
   padding: 70px 0;
   height: 100vh;
-  background-image: url("../../img/bg/background.jpg");
+  background-image: url("../img/bg/background.jpg");
   background-size: cover; }
 
 .page-wrapper {
@@ -516,12 +516,12 @@ button,
 
 .vinylizer {
   position: relative;
-  margin-right: 150px;
+  margin-right: 10%;
   padding: 35px 45px;
   min-width: 700px;
   height: 570px;
   border-radius: 35px;
-  background-image: url("../../img/bg/vinylizer-background.jpg");
+  background-image: url("../img/bg/vinylizer-background.jpg");
   background-size: cover;
   -webkit-box-shadow: 10px 10px 30px #000000;
           box-shadow: 10px 10px 30px #000000; }
@@ -580,6 +580,10 @@ button,
       -ms-flex-align: center;
           align-items: center; }
 
+.vinylizer__button--playing {
+  -webkit-transform: rotate(160deg);
+          transform: rotate(160deg); }
+
 .vinylizer__button:focus {
   outline: none; }
 
@@ -614,3 +618,5 @@ button,
   .playlist li {
     cursor: pointer;
     margin-bottom: 30px; }
+    .playlist li:hover, .playlist li:focus {
+      opacity: 0.5; }
